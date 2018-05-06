@@ -13,7 +13,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 public class Client {
-	//C:/Users/Siki/Desktop/download.txt
+	//Putanja za skidanje fajla
+	//Paziti na dobar unos
 	private static String PUTANJA = JOptionPane.showInputDialog("Unesite path") + "/download.txt";
 
 	public Client() throws Exception {
@@ -23,7 +24,7 @@ public class Client {
 		
 		DatagramSocket socket = new DatagramSocket();
 		InetAddress ip = InetAddress.getByName("localhost");
-		FileWriter fw = new FileWriter(PUTANJA, true);
+		
 		
 		
 		while(true) {
@@ -36,6 +37,7 @@ public class Client {
 			socket.send(packet);
 			
 			if(msg.equalsIgnoreCase("download")) {
+				FileWriter fw = new FileWriter(PUTANJA, true);
 				buffer = new byte[300];
 				packet = new DatagramPacket(buffer, buffer.length);
 				socket.receive(packet);
@@ -53,12 +55,16 @@ public class Client {
 					buffer = new byte[512];
 					packet = new DatagramPacket(buffer, buffer.length);
 					socket.receive(packet);
-					String por = new String(buffer).trim();
-					if(por.equals("KRAJ")) break;
-					fw.write(por);
+					
 					String dobro = "Primio";
 					packet = new DatagramPacket(dobro.getBytes(), dobro.getBytes().length, ip, 2018);
 					socket.send(packet);
+					
+					
+					String por = new String(buffer).trim();
+					if(por.equals("KRAJ")) break;
+					fw.write(por);
+					
 				}
 				fw.close();
 			}else if(msg.equalsIgnoreCase("upload")) {
@@ -71,8 +77,6 @@ public class Client {
 					System.out.println("Poslao uspesno!");
 				}
 			}else if(msg.equalsIgnoreCase("read")) {
-				
-				
 				
 				buffer = new byte[300];
 				packet = new DatagramPacket(buffer, buffer.length);
@@ -99,12 +103,15 @@ public class Client {
 					buffer = new byte[512];
 					packet = new DatagramPacket(buffer, buffer.length);
 					socket.receive(packet);
-					String por = new String(buffer).trim();
-					if(por.equals("KRAJ")) break;
-					area.append(por);
+					
 					String dobro = "Primio";
 					packet = new DatagramPacket(dobro.getBytes(), dobro.getBytes().length, ip, 2018);
 					socket.send(packet);
+					
+					String por = new String(buffer).trim();
+					if(por.equals("KRAJ")) break;
+					area.append(por);
+					
 				}
 			}else if(msg.equalsIgnoreCase("quit")) {
 				String q = "QUIT";

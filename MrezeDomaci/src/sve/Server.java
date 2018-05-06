@@ -16,13 +16,7 @@ public class Server {
 
 	public Server() throws Exception {
 
-		fajlovi.add("C:/Users/Siki/Desktop/provera/a.txt");
-		fajlovi.add("C:/Users/Siki/Desktop/provera/1.txt");
-		fajlovi.add("C:/Users/Siki/Desktop/provera/2.txt");
-		fajlovi.add("C:/Users/Siki/Desktop/provera/3.txt");
-		fajlovi.add("C:/Users/Siki/Desktop/provera/4.txt");
-		fajlovi.add("C:/Users/Siki/Desktop/provera/5.txt");
-		//fajlovi.add("C:/Users/Siki/Desktop/provera/6.txt");
+		
 		
 		
 		
@@ -66,17 +60,20 @@ public class Server {
 						odabir = s;
 					}
 				}
-				//slanje file-a
+				//slanje fajla
 				Path path = Paths.get(odabir);
 				byte[] data = Files.readAllBytes(path);
-				byte[] chunk = new byte[512];
+				byte[] chunk = new byte[512];			//deo fajla od 512b koji se salje klijentu u vidu paketa
 				if(data.length < 512) {
 					packet = new DatagramPacket(data, data.length, sender, portSendera);
 					socket.send(packet);
 				}else {
 					int j = 0;
-					for(int i = 0; i < data.length-1; i++) {
-						if(i % 511 == 0 && i != 0) {
+					for(int i = 0; i < data.length; i++) {
+						if((i % 511 == 0 && i != 0) || i == data.length-1) {
+							if(i == data.length -1) {
+								chunk[i%511] = data[i];
+							}
 							packet = new DatagramPacket(chunk, chunk.length, sender, portSendera);
 							socket.send(packet);
 							
@@ -104,7 +101,8 @@ public class Server {
 				packet = new DatagramPacket(buffer, buffer.length);
 				socket.receive(packet);
 				String noviPath = new String(buffer).trim();
-				System.out.println("Dodat novi file: " + noviPath);
+				File f = new File(noviPath);
+				System.out.println("Dodat novi file: " + f.getName());
 				fajlovi.add(noviPath);
 			}else if(op.equalsIgnoreCase("QUIT")) {
 				socket.close();
